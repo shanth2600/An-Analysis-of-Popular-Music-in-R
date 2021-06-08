@@ -150,3 +150,45 @@ summary(lm.fit)
 ```
 
 **Results**: As we can see due the low p-value, chances are high that the number of influences of an artist has a significant positive correlation with the number of top 100 hits. This suggests that originality is not rewarded when it comes to popular music.
+
+
+### How many observable "genres" are present in the data?
+
+Using attributes such as: 
+  * danceability
+  * energy 
+  * valence 
+  * tempo 
+  * loudness 
+  * mode 
+  * key 
+  * acousticness 
+  * instrumentalness 
+  * liveness 
+  * speechiness  
+  * explicit
+  * duration 
+
+We extract a small sample of data (this is done to avoid trying to run the clustering algorithm on millions of data points) and use the [HCPC method](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/) provided by the *FactoMineR* package to compute principle components, perform hierarchical clustering and further adjust the resulting partitioning with *K-Means*: 
+
+```
+install.packages(c("FactoMineR", "factoextra"))
+library(factoMineR)
+library(factoextra)
+
+ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.8,0.2))
+fmusic1 <- fullMusicDNew[ind==1, ]
+fmusic2 <- fullMusicDNew[ind==2, ]
+
+res.pca <- PCA(fmusic2, ncp = 3, graph = FALSE)
+res.hcpc <- HCPC(res.pca, graph = FALSE)
+
+plot(res.hcpc)
+
+```
+
+***Results***
+As can be seen in the following graph, we identify at least 3 different kinds (or genres) of songs in our dataset (the sample that we chose to work with). 
+
+![Clusters of the music data set](images/musicDataSetCluster.png)
+
