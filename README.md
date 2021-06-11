@@ -171,12 +171,15 @@ Using attributes such as:
 
 We extract a small sample of data (this is done to avoid trying to run the clustering algorithm on millions of data points) and use the [HCPC method](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/) provided by the *FactoMineR* package to compute principle components, perform hierarchical clustering and further adjust the resulting partitioning with *K-Means*: 
 
-```
-install.packages(c("FactoMineR", "factoextra"))
-library(factoMineR)
+
+```{r Generes, echo=TRUE, message=FALSE}
+
+library(FactoMineR)
 library(factoextra)
 
-ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.8,0.2))
+fullMusicDNew <- subset(full_music_data, select=-c(artist_names, artists_id, year, release_date, popularity, song_title..censored.))
+
+ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.9,0.1))
 fmusic1 <- fullMusicDNew[ind==1, ]
 fmusic2 <- fullMusicDNew[ind==2, ]
 
@@ -190,5 +193,13 @@ plot(res.hcpc)
 ***Results***
 As can be seen in the following graph, we identify at least 3 different kinds (or genres) of songs in our dataset (the sample that we chose to work with). 
 
-![Clusters of the music data set](images/musicDataSetCluster.png)
+
+## Analysis
+
+## Impact
+Though the social impact of our inquiries may not have the same weight as an analysis of Covid-19 statistics or global debt, they may have a cultural or artistic impact; oftentimes, popular music is seen as the soundtrack of a generation or time period. Millions of music fans all over the world spend countless billions of dollars on recordings and concert tickets for a shared experience of something “transcendent”. The issue is, especially with popular music, the art is more often manufactured than created; record label executives have formulas, both musical and aesthetic, which when utilized, will reliably generate hit music. Our analysis seems to point to the existence of these formulas (whether or not they are created deliberately). We believe that in the act of attempting to reverse engineer these formulas, we may begin to better understand not only the mechanics behind what makes music popular, but also those characteristics of music which evoke certain feelings within ourselves; thus potentially inspiring a more mindful consumption of art. 
+
+There is however the unfortunate other side of the coin in this research which can’t be helped. Though the analysis of such statistics can be used in an introspective sense to help fans see through the “music by numbers” approach employed by lazy artists and greedy executives, it can also be used by those very same bad actors to create even more optimized formulas for mass consumption.
+
+
 
