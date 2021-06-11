@@ -222,6 +222,15 @@ As can be seen in the following graph, we identify at least 3 different kinds (o
 
 ## Analysis
 
+### Trends
+It comes as a big surprise to no one that popular music follows distinct trends over time. We saw this reflected in our plots of tempo, liveness, energy, instrumentalness, and song duration over time. This suggests that popular artists, whether by parallel thinking or deliberate choice, largely follow the lead of other popular artists in the type of the music which they release.
+
+### Music by Numbers
+We were able to create a model which given those variables (and combination of variables) most highly correlated to popularity was able to predict with almost \~98% accuracy whether a song would be a top 10 hit or not. We posit that if songwriting were a purely creative endeavor, that this would be impossible. Our remarkable ability to predict popularity to such a high level of accuracy suggests popular music can be created through a "music by numbers" approach. Further evidence against the creativity of pop music was our model which correlated "originality" with popularity and found a statistically significant positive relationship between the number of influences of an artist and their popularity (we do concede however, that our notion of originality is not tautological and it is further made dubious by that fact that the influence data is self-reported).
+
+The counterpoint to this argument that pop music is by and large not creative would that the trends in music come from some external source (correlation, not causation) ie massive parallel thinking, a collective unconscious, zeitgeist etc. We would however argue that due to the lucrative nature of popular music, and the vast number of record companies and individuals which stand to profit from hits, occam's razor would seem to suggest that the formulas behind popular music do not emerge from a Jungian construct.
+
+
 
 ## Impact
 Though the social impact of our inquiries may not have the same weight as an analysis of Covid-19 statistics or global debt, they may have a cultural or artistic impact; oftentimes, popular music is seen as the soundtrack of a generation or time period. Millions of music fans all over the world spend countless billions of dollars on recordings and concert tickets for a shared experience of something “transcendent”. The issue is, especially with popular music, the art is more often manufactured than created; record label executives have formulas, both musical and aesthetic, which when utilized, will reliably generate hit music. Our analysis seems to point to the existence of these formulas (whether or not they are created deliberately). We believe that in the act of attempting to reverse engineer these formulas, we may begin to better understand not only the mechanics behind what makes music popular, but also those characteristics of music which evoke certain feelings within ourselves; thus potentially inspiring a more mindful consumption of art. 
