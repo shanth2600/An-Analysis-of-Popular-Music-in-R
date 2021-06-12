@@ -34,7 +34,6 @@ We plotted the values of specific variables over time to see if we could find di
 ggplot(full_music_data, aes(x = year, y=tempo)) + geom_smooth()
 ```
 
-<br>
 **Tempo**: The tempo of popular music hit's a distinct hump at around 1935 which is when swing was at it's most popular. The following dip is swing going out of style. After the post-swing dip however, the tempo of popular music as steadily grown (Though there is a dip after 2010).
 
 ```{r Liveness, echo=TRUE, message=FALSE}
