@@ -128,7 +128,7 @@ table(pred.fit,test$popularity)
 
 ```
 
-### Does Originality have any effect on popularity?
+### Can we predict whether a song will be a hit?
 
 ======= **Results**: (13242 + 171) / (13242 + 171 + 41 + 251) = \~98% Correct or \~2% Error on test data. We found that this was the optimal subset of variables and that 0.5 was the best threshold for top 10 or not (0 or 1). The fact that we were able to predict to this high of an accuracy seems to suggests that popularity in music may be even more formulaic than we previously thought.
 
