@@ -3,12 +3,11 @@ title: "An Analysis of Popular Music"
 author: "Bosco Ndemeye and Shant Hairapetian"
 date: "6/7/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
-```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, echo = TRUE,  message=FALSE}
 library(ggplot2)
 library(xts)
 library(magrittr) 
@@ -16,8 +15,11 @@ library(dplyr)
 library(tidyverse)
 library(sjPlot)
 library(data.table)
-influences <- read.csv('music_data_set/influence_data.csv')
-full_music_data <- read.csv('music_data_set/full_music_data.csv')
+library(viridis) 
+library(FactoMineR)
+library(factoextra)
+influences <- read.csv('~/Desktop/670/data/influence_data.csv')
+full_music_data <- read.csv('~/Desktop/670/data/full_music_data.csv')
 ```
 
 ## The Data
@@ -130,7 +132,7 @@ table(pred.fit,test$popularity)
 
 ### Can we predict whether a song will be a hit?
 
-======= **Results**: (13242 + 171) / (13242 + 171 + 41 + 251) = \~98% Correct or \~2% Error on test data. We found that this was the optimal subset of variables and that 0.5 was the best threshold for top 10 or not (0 or 1). The fact that we were able to predict to this high of an accuracy seems to suggests that popularity in music may be even more formulaic than we previously thought.
+**Results**: (13242 + 171) / (13242 + 171 + 41 + 251) = \~98% Correct or \~2% Error on test data. We found that this was the optimal subset of variables and that 0.5 was the best threshold for top 10 or not (0 or 1). The fact that we were able to predict to this high of an accuracy seems to suggests that popularity in music may be even more formulaic than we previously thought.
 
 ### Does Originality have any effect on popularity?
 
@@ -180,7 +182,7 @@ summary(lm.fit)
 
 We answer this question by counting the frequency of each unique singer in the influence data, and present the results using a worldcloud of the influencer names:
 
-```{r}
+```{r , echo = TRUE, message = FALSE}
 influence_edges <- select(influences, influencer_name, follower_name)
 influencers     <- select(influence_edges, influencer_name) 
 followers       <- select(influence_edges, follower_name) 
@@ -225,9 +227,7 @@ Using attributes such as:
 
 To answer this question, we posit that "song similarity" can be quantified using the euclidean distance between two vectors, each corresponding to one song, with an entry in the vector corresponding to the song's recorded value of the attribute in the dataset when these attributes are sorted in the order presented above. We extract a small sample of the data (this is done to avoid trying to run the clustering algorithm on millions of data points) and use the [HCPC method](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/) provided by the *FactoMineR* package to compute principle components, perform hierarchical clustering and further adjust the resulting partitioning with *K-Means*:
 
-    install.packages(c("FactoMineR", "factoextra"))
-    library(factoMineR)
-    library(factoextra)
+``` {r K-Means, echo = TRUE, message = FALSE}
 
     fullMusicDNew <- subset(full_music_data, select=-c(artist_names, artists_id, year, release_date, popularity, song_title..censored.))
     ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.9,0.1))
@@ -238,10 +238,11 @@ To answer this question, we posit that "song similarity" can be quantified using
     res.hcpc <- HCPC(res.pca, graph = FALSE)
 
     plot(res.hcpc)
+  ```
 
 ***Results*** The above cluster analysis reveals that, based on this similarity criterion, the songs in this dataset can be grouped into three categories. This is despite the fact that our data lists artists belonging to a total of 20 different genres as the following lines of R code demonstrate:
 
-```{r}
+```{r, echo = TRUE, message = FALSE}
 library(sets)
 inf_set <- as.set(influences$influencer_main_genre) 
 foll_set <- as.set(influences$follower_main_genre)
@@ -258,8 +259,7 @@ pop_genres <- select(influences, influencer_main_genre)
 pop_genres_df <- as.data.frame(table(pop_genres)) 
 pop_genres_df <- pop_genres_df[order(-pop_genres_df$Freq), ] 
 
-install.packages('viridis') 
-library(viridis) 
+
 
 pie(pop_genres_df$Freq, labels = NA, radius = 1, col = inferno(20)) 
 legend(.9, .1, pop_genres_df$pop_genres, cex = 0.7, fill = inferno(20))
