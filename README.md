@@ -36,7 +36,7 @@ The data we used is comprised of two separate datasets:
 
 ## Our Questions
 
-### What are the characteristics of popular music over the years
+### What are the characteristics of popular music over the years?
 
 We plotted the values of specific variables over time to see if we could find distinct trends in popular music over time. By applying some geometric smoothing, we found that a subset of the variables exhibited distinct shifts over time which corresponded to popularity of certain types of music in specific time periods.
 
@@ -240,7 +240,7 @@ To answer this question, we posit that "song similarity" can be quantified using
     plot(res.hcpc)
   ```
 
-***Results*** The above cluster analysis reveals that, based on this similarity criterion, the songs in this dataset can be grouped into three categories. This is despite the fact that our data lists artists belonging to a total of 20 different genres as the following lines of R code demonstrate:
+***Results*** The above cluster analysis reveals that, based on this similarity criterion, the songs in this dataset can be grouped into five categories. This is despite the fact that our data lists artists belonging to a total of 20 different genres as the following lines of R code demonstrate:
 
 ```{r, echo = TRUE, message = FALSE}
 library(sets)
