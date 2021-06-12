@@ -2,7 +2,9 @@
 title: "An Analysis of Popular Music"
 author: "Bosco Ndemeye and Shant Hairapetian"
 date: "6/7/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=TRUE}
@@ -23,11 +25,17 @@ full_music_data <- read.csv('music_data_set/full_music_data.csv')
 The data we used is comprised of two separate datasets:
 
 -   **full_music_data** : Data which provides 16 variable entries about each of the top 100 songs from 1929 to 2020. This data was scraped from Spotify's API by some third party.
+
+    ```{r}
+    head(full_music_data)
+    ```
+
 -   **influence_data**: Data outlining the self-reported direct influences of artists. This data was scraped by a Harvard graduate student (Wenzhe Xue) from allmusic.com for the purposes of writing a thesis analyzing musical influence among popular artists.
 
 ## Our Questions
 
 ### What are the characteristics of popular music over the years
+
 We plotted the values of specific variables over time to see if we could find distinct trends in popular music over time. By applying some geometric smoothing, we found that a subset of the variables exhibited distinct shifts over time which corresponded to popularity of certain types of music in specific time periods.
 
 ```{r Tempo, echo=TRUE, message=FALSE}
@@ -79,14 +87,12 @@ After establishing distinct trends in popular music over time, we aimed to find 
 
 We normalized the popularity value to 1 for top ten tracks and 0 for anything outside of the top ten. Due to the binary nature of this classification, we trained a logistic regression classifier using the variables in the dataset which were most highly correlated to popularity. These variables were:
 
-<ul>
-  <li>liveness</li>
-  <li>loudness</li>
-  <li>duration_ms</li>
-  <li>(date * duration_ms)</li>
-</ul>
-(The last variable confounds the date at which a song was released and its length)
+-   liveness
+-   loudness
+-   duration_ms
+-   (date \* duration_ms)
 
+(The last variable confounds the date at which a song was released and its length)
 
 For validation, we did a 80/20 training/test split.
 
@@ -122,16 +128,13 @@ table(pred.fit,test$popularity)
 
 ```
 
+### Does Originality have any effect on popularity?
+
+======= **Results**: (13242 + 171) / (13242 + 171 + 41 + 251) = \~98% Correct or \~2% Error on test data. We found that this was the optimal subset of variables and that 0.5 was the best threshold for top 10 or not (0 or 1). The fact that we were able to predict to this high of an accuracy seems to suggests that popularity in music may be even more formulaic than we previously thought.
 
 ### Does Originality have any effect on popularity?
 
-=======
-**Results**: (13242 + 171) / (13242 + 171 + 41 + 251) = ~98% Correct or ~2% Error on test data. We found that this was the optimal subset of variables and that 0.5 was the best threshold for top 10 or not (0 or 1). The fact that we were able to predict to this high of an accuracy seems to suggests that popularity in music may be even more formulaic than we previously thought.
-
-
-### Does Originality have any effect on popularity?
-
-In a further exploration of role of originality and creativity (or lackthereof) in popular music, we sought to find a measure for the originality of an artist within our dataset and correlate that to the number of top 100 tracks that artist has had. As a measure of originality we counted the number of influences an artist self-reported. The lower the number of influences, the more original their music (at least that's our hypothesis). 
+In a further exploration of role of originality and creativity (or lackthereof) in popular music, we sought to find a measure for the originality of an artist within our dataset and correlate that to the number of top 100 tracks that artist has had. As a measure of originality we counted the number of influences an artist self-reported. The lower the number of influences, the more original their music (at least that's our hypothesis).
 
 For this model we found that a linear fit yielded the lowest p-value, and as such it seems that the actual relationship between "originality" and popularity is close to linear.
 
@@ -171,7 +174,7 @@ summary(lm.fit)
 
 ```
 
-**Results**: As we can see due the low p-value (< 2e-16), chances are high that the number of influences of an artist has a significant positive correlation with the number of top 100 hits. This suggests that, if our interpretation of orginality is correct in this data, it is not rewarded when it comes to popular music. Quite the opposite.
+**Results**: As we can see due the low p-value (\< 2e-16), chances are high that the number of influences of an artist has a significant positive correlation with the number of top 100 hits. This suggests that, if our interpretation of orginality is correct in this data, it is not rewarded when it comes to popular music. Quite the opposite.
 
 ### Which artists have had the most musical influence?
 
@@ -216,17 +219,18 @@ Using attributes such as:
 -   acousticness
 -   instrumentalness
 -   liveness
--   speechiness  
+-   speechiness
 -   explicit
 -   duration
 
-We extract a small sample of data (this is done to avoid trying to run the clustering algorithm on millions of data points) and use the [HCPC method](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/) provided by the *FactoMineR* package to compute principle components, perform hierarchical clustering and further adjust the resulting partitioning with *K-Means*:
+To answer this question, we posit that "song similarity" can be quantified using the euclidean distance between two vectors, each corresponding to one song, with an entry in the vector corresponding to the song's recorded value of the attribute in the dataset when these attributes are sorted in the order presented above. We extract a small sample of the data (this is done to avoid trying to run the clustering algorithm on millions of data points) and use the [HCPC method](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/) provided by the *FactoMineR* package to compute principle components, perform hierarchical clustering and further adjust the resulting partitioning with *K-Means*:
 
     install.packages(c("FactoMineR", "factoextra"))
     library(factoMineR)
     library(factoextra)
 
-    ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.8,0.2))
+    fullMusicDNew <- subset(full_music_data, select=-c(artist_names, artists_id, year, release_date, popularity, song_title..censored.))
+    ind <- sample(2, nrow(fullMusicDNew), replace = T, prob = c(0.9,0.1))
     fmusic1 <- fullMusicDNew[ind==1, ]
     fmusic2 <- fullMusicDNew[ind==2, ]
 
@@ -235,7 +239,7 @@ We extract a small sample of data (this is done to avoid trying to run the clust
 
     plot(res.hcpc)
 
-***Results*** The above cluster analysis reveals that the songs in this dataset can be grouped into three categories. This is despite the fact that our data lists artists belonging to a total of 20 different genres as the following lines of R code demonstrate:
+***Results*** The above cluster analysis reveals that, based on this similarity criterion, the songs in this dataset can be grouped into three categories. This is despite the fact that our data lists artists belonging to a total of 20 different genres as the following lines of R code demonstrate:
 
 ```{r}
 library(sets)
@@ -245,9 +249,9 @@ genres  <- set_union(inf_set, foll_set)
 length(genres)
 ```
 
-This disparity might be because, in the hopes to cut down on runtime, we only used 20% of the data for this clustering task, but it might also be because, in terms of the metrics listed above, many songs are more closely related than self-reported genres of their singers might have you believe.
+This disparity might be because, in the hopes to cut down on runtime, we only used 10% of the data for this clustering task, but it might also be because our notion of similarity does not precisely correspond to a genre and many songs across genres are more closely related.
 
-One a related note, similar to how we settled the debate about who the most influential singers might be, we show a pie chart of genres as reported by the artists themselves. Perhaps unsurprisingly, most artists identify as Pop/rock singers.
+On a related note, similar to how we settled the debate about who the most influential singers might be, we show a pie chart of genres as reported by the artists themselves. Perhaps unsurprisingly, we find that most artists identify as Pop/Rock singers.
 
 ```{r}
 pop_genres <- select(influences, influencer_main_genre) 
@@ -263,26 +267,24 @@ legend(.9, .1, pop_genres_df$pop_genres, cex = 0.7, fill = inferno(20))
 
 ### Conclusions
 
-Music forms such a big part of the human experience that its influence on many people's lives cannot be overstated. Because the listening experience is such a subjective experience, we believe it would be fair to say that no objective study of songs (including our own) can every truly capture its effects on humanity. However, subjective though it might be, perhaps because of the fact, it is still interesting to study the numbers related to the subject and uncover any patterns. The same song might illicit two completely different feelings in two individuals, but if many more people are listening to the same song (sometimes over and over) there has to be something special about the song. The fact that these "popularity" numbers and other physical properties of the songs were measured and collected into a dataset with 98340 unique items, allowed us to investigate the last 90 years of music on this planet and identify patterns that reveal information about this time period. For example, by looking at tempo, we were able to identify the time period when swing rose to popularity, and by looking at explicitness, we pinpointed when vulgarity in songs stopped being something the general public took issue with.
+Music forms such a big part of the human experience that its influence on many people's lives cannot be overstated. Because the listening experience is so subjective, we believe it would be fair to say that no objective study of songs (including our own) can ever truly capture its grip on the zeitgeist across time. However, subjective though it might be--- and perhaps because of the fact---it is still interesting to study the numbers related to the subject and relate the findings to physical world. The same song might elicit two completely different feelings in two individuals, but if many more people are listening to the same song (sometimes over and over) there has to be something special about the song, and we would like to quantify the characteristics of these special songs. The fact that these quantifiable properties were measured and collected into a dataset with 98340 unique items, allowed us to investigate the last 90 years of music on this planet. For example, by looking at tempo, we were able to identify the time period when swing rose to popularity, and by looking at explicitness, we pinpointed when vulgarity in songs stopped being something the general public took issue with.
 
-Moreover, using a model that used three parameters (i.e liveness, loudness, and duration) we developed a highly accurate model (97%) for predicting the popularity of an unseen song. This information could be used by talented but avaricious artists for example who want to succeed quickly. In addition to this, we settled a few dinner debates. For example, we found that chances are high that music originality and popularity are negatively correlated. Therefore, it is indeed true that to find original music one has to probably dig deeper than following the billboard top 100. In addition, we confirmed that The Beatles have had the most musical influence in all of the past 90 years, and that most artists identify as Pop/rock singers. Lastly, a cluster analysis of 20% of the total songs we had at our disposal, revealed that if everything about music could be captured by the parameters recorded in this dataset, we could group them in only 3 clusters. Either this points to the above claim that music experience, and therefore similarity, is a highly subjective matter and thus no dataset that relies on physical properties of songs is well equiped to investigate "song similarity" or the number of songs that were used for this clustering task was insufficient and perhaps more groups could have been uncovered given more running time and more data (after all if each 20% chunk produces 3 different groupings, we could have 15 clusters in total; which sounds more reasonable).
-
-### Impact
-=======
+Moreover, using a model that used three parameters (i.e liveness, loudness, and duration) we developed a highly accurate model (98%) for predicting the popularity of an unseen song. For example, such information could be used (and is probably being used) by artists who want to succeed quickly without much care about the originality of their material. In addition to this, we settled a few dinner debates. For example, we found that chances are high that music originality and popularity are negatively correlated. Therefore, it is indeed true that to find original music one has to probably dig deeper than following the billboard top 100. In addition, we confirmed that The Beatles have had the most musical influence in all of the past 90 years, and that most artists identify as Pop/rock singers. Lastly, a cluster analysis of 10% of the total songs we had at our disposal, revealed that if everything about music could be captured with the parameters recorded in this dataset, we could group them in only 3 clusters. Either this points to the above claim that music experience, and therefore similarity, is a highly subjective matter and thus no statistical analysis is well equiped to investigate "song similarity" or the number of songs that were used for this clustering task was insufficient and perhaps more groups could have been uncovered given more running time and more data.
 
 ## Analysis
 
 ### Trends
+
 It comes as a big surprise to no one that popular music follows distinct trends over time. We saw this reflected in our plots of tempo, liveness, energy, instrumentalness, and song duration over time. This suggests that popular artists, whether by parallel thinking or deliberate choice, largely follow the lead of other popular artists in the type of the music which they release.
 
 ### Music by Numbers
+
 We were able to create a model which given those variables (and combination of variables) most highly correlated to popularity was able to predict with almost \~98% accuracy whether a song would be a top 10 hit or not. We posit that if songwriting were a purely creative endeavor, that this would be impossible. Our remarkable ability to predict popularity to such a high level of accuracy suggests popular music can be created through a "music by numbers" approach. Further evidence against the creativity of pop music was our model which correlated "originality" with popularity and found a statistically significant positive relationship between the number of influences of an artist and their popularity (we do concede however, that our notion of originality is not tautological and it is further made dubious by that fact that the influence data is self-reported).
 
-The counterpoint to this argument that pop music is by and large not creative would that the trends in music come from some external source (correlation, not causation) ie massive parallel thinking, a collective unconscious, zeitgeist etc. We would however argue that due to the lucrative nature of popular music, and the vast number of record companies and individuals which stand to profit from hits, occam's razor would seem to suggest that the formulas behind popular music do not emerge from a Jungian construct.
-
-
+The counterpoint to this argument that pop music is by and large not creative would be that the trends in music come from some external source (correlation, not causation) i.e massive parallel thinking, a collective unconscious, zeitgeist etc. We would however argue that due to the lucrative nature of popular music, and the vast number of record companies and individuals which stand to profit from hits, occam's razor would seem to suggest that the formulas behind popular music do not emerge from a Jungian construct.
 
 ## Impact
-Though the social impact of our inquiries may not have the same weight as an analysis of Covid-19 statistics or global debt, they may have a cultural or artistic impact; oftentimes, popular music is seen as the soundtrack of a generation or time period. Millions of music fans all over the world spend countless billions of dollars on recordings and concert tickets for a shared experience of something “transcendent”. The issue is, especially with popular music, the art is more often manufactured than created; record label executives have formulas, both musical and aesthetic, which when utilized, will reliably generate hit music. Our analysis seems to point to the existence of these formulas (whether or not they are created deliberately). We believe that in the act of attempting to reverse engineer these formulas, we may begin to better understand not only the mechanics behind what makes music popular, but also those characteristics of music which evoke certain feelings within ourselves; thus potentially inspiring a more mindful consumption of art. 
 
-There is however the unfortunate other side of the coin in this research which can’t be helped. Though the analysis of such statistics can be used in an introspective sense to help fans see through the “music by numbers” approach employed by lazy artists and greedy executives, it can also be used by those very same bad actors to create even more optimized formulas for mass consumption.
+Though the social impact of our inquiries may not have the same weight as an analysis of Covid-19 statistics or global debt, they may have a cultural or artistic impact; oftentimes, popular music is seen as the soundtrack of a generation or time period. Millions of music fans all over the world spend countless billions of dollars on recordings and concert tickets for a shared experience of something "transcendent". The issue is, especially with popular music, the art is more often manufactured than created; record label executives have formulas, both musical and aesthetic, which when utilized, will reliably generate hit music. Our analysis seems to point to the existence of these formulas (whether or not they are created deliberately). We believe that in the act of attempting to reverse engineer these formulas, we may begin to better understand not only the mechanics behind what makes music popular, but also those characteristics of music which evoke certain feelings within ourselves; thus potentially inspiring a more mindful consumption of art.
+
+There is however the unfortunate other side of the coin in this research which can't be helped. Though the analysis of such statistics can be used in an introspective sense to help fans see through the "music by numbers" approach employed by lazy artists and greedy executives, it can also be used by those very same bad actors to create even more optimized formulas for mass consumption.
